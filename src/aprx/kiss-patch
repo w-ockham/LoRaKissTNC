@@ -1,0 +1,92 @@
+diff --git a/aprx.c b/aprx.c
+index 508166d..b6fd7ea 100644
+--- a/aprx.c
++++ b/aprx.c
+@@ -660,9 +660,14 @@ void rflog(const char *portname, char direction, int discard, const char *tnc2bu
+ 			char timebuf[60];
+ 			printtime(timebuf, sizeof(timebuf));
+ 
+-			(void)fprintf(fp, "%s %-9s ", timebuf, portname);
+-			(void)fprintf(fp, "%c ", direction);
++		        (void)fprintf(fp, "%s %-9s ", timebuf, portname);
+ 
++			if(strlen(lastRssi) > 0) {
++			  (void)fprintf(fp, "%c(%s) ", direction, lastRssi);
++			  lastRssi[0] = '\0';
++			}
++			else 
++			  (void)fprintf(fp, "%c ", direction);
+ 			if (discard < 0) {
+ 				fprintf(fp, "*");
+ 			}
+diff --git a/aprx.h b/aprx.h
+index 0e8e911..04eadd2 100644
+--- a/aprx.h
++++ b/aprx.h
+@@ -194,6 +194,8 @@ extern void aprxlog(va_list);
+ extern void rflog(const char *portname, char direction, int discard, const char *tnc2buf, int tnc2len);
+ extern void rfloghex(const char *portname, char direction, int discard, const uint8_t *buf, int buflen);
+ 
++extern char lastRssi[];
++
+ /* netresolver.c */
+ extern void netresolv_start(void); // separate thread working on this!
+ extern void netresolv_stop(void);
+diff --git a/kiss.c b/kiss.c
+index 984d21b..0c30588 100644
+--- a/kiss.c
++++ b/kiss.c
+@@ -167,11 +167,13 @@ int kissencoder( void *kissbuf, int kissspace, LineType linetype,
+ 	}
+ }
+ 
++char lastRssi[17] = {'\0'};
+ 
+ static int kissprocess(struct serialport *S)
+ {
+ 	int i;
+ 	int cmdbyte = S->rdline[0];
++	int command = cmdbyte & 0x0F;
+ 	int tncid = (cmdbyte >> 4) & 0x0F;
+ 
+ 	/* --
+@@ -190,8 +192,7 @@ static int kissprocess(struct serialport *S)
+ 
+ 	/* Ok, cmdbyte tells us something, and we should ignore the
+ 	   frame if we don't know it... */
+-
+-	if ((cmdbyte & 0x0F) != 0) {
++	if ((command != 0)&&(command != 6)) {
+ 		/* There should NEVER be any other value in the CMD bits
+ 		   than 0  coming from TNC to host! */
+ 		/* printf(" ..bad CMD byte\n"); */
+@@ -414,18 +415,22 @@ static int kissprocess(struct serialport *S)
+ 			return -1;
+ 		}
+ 	}
+-
+-
+-	if (S->rdlinelen < 17) {
++	if ((S->rdlinelen < 17) || (command == 6)) {
+ 		/* 7+7+2 bytes of minimal AX.25 frame + 1 for KISS CMD byte */
+ 
+ 		/* Too short frame.. */
+ 		/* printf(" ..too short a frame for anything\n");  */
+-		rfloghex(S->ttyname, 'D', 1, S->rdline, S->rdlinelen);
+-		erlang_add(S->ttycallsign[tncid], ERLANG_DROP, S->rdlinelen, 1);	/* Account one packet */
+-		return -1;
++	  if (command != 6) {
++	    rfloghex(S->ttyname, 'D', 1, S->rdline, S->rdlinelen);
++	  } else {
++	    memcpy(lastRssi, S->rdline + 1, S->rdlinelen - 1);
++	    lastRssi[S->rdlinelen - 1] = '\0';
++	    if (debug > 0)
++	      printf("Received RSSI=(%s)\n",lastRssi);
++	  }
++	  erlang_add(S->ttycallsign[tncid], ERLANG_DROP, S->rdlinelen, 1);
++	  return -1;
+ 	}
+-
+ 	/* Valid AX.25 HDLC frame byte sequence is now at
+ 	   S->rdline[1..S->rdlinelen-1]
+ 	   */

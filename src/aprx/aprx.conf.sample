@@ -1,0 +1,39 @@
+mycall  JS1YFC-6
+myloc lat 3536.05N lon 13931.22E
+
+<aprsis>
+	passcode 12345 # Fill with your passcord.
+	server    rotate.aprs2.net
+</aprsis>
+
+<logging>
+	pidfile /var/run/aprx.pid
+	rflog /var/log/aprx/aprx-rf.log
+	aprxlog /var/log/aprx/aprx.log
+</logging>
+
+<interface>
+	serial-device /dev/ttyACM0  9600 8n1    KISS
+	# Freq=438.51MHz BW=62.5kHz SF=18 CR=8 Backofftime=10000ms
+	initstring "SET 43851,6,11,8,10000\x0d"
+	callsign     $mycall
+	tx-ok        true
+</interface>
+
+<beacon>
+	beaconmode aprsis
+	cycle-size  5m
+	beacon exec /usr/local/bin/aprxLastseen.sh
+</beacon>
+
+<digipeater>
+	transmitter     $mycall
+	<source>
+		source        APRSIS
+		relay-type    third-party
+		ratelimit     240 480
+		via-path      WIDE1-1
+		msg-path      WIDE1-1
+		filter -t/st
+    </source>
+</digipeater>
