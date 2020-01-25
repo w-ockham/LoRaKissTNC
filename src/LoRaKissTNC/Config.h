@@ -49,7 +49,7 @@
   bool isBackoff = false;
   
   // Default LoRa settings
-  int       loraSpreadingFactor = 10;
+  int       loraSpreadingFactor = 11;
   int       loraCodingRate      = 8;
   int       loraTxPower         = 20;
   uint32_t  bandWidthTable[] = { 7.8e3, 10.4e3, 15.6e3, 20.8e3, 31.25e3, 41.7e3, 62.5e3, 125e3, 250e3};

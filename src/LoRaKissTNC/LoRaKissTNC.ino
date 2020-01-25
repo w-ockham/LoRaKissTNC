@@ -52,15 +52,18 @@ void transmit(size_t size) {
 }
 
 void serialCallback(uint8_t txByte) {
-  if (inFrame && txByte == FEND && command == CMD_DATA) {
+  if (inFrame && txByte == FEND) {
     inFrame = false;
-    //Serial.println("FULL_KISS");
-    if (outboundReady) {
-        kissIndicateError(ERROR_QUEUE_FULL);
-    }
-    else {
+    if ( command == CMD_DATA ) {
+       //Serial.println("FULL_KISS");
+       if (outboundReady) {
+         kissIndicateError(ERROR_QUEUE_FULL);
+      } else {
         outboundReady = true;
         //Serial.println("RDY_OUT");
+      }
+    } else if ( command == CMD_RETURN ) {
+      commandMode = true; 
     }
   }
   else if (txByte == FEND) {

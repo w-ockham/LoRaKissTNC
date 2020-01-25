@@ -9,7 +9,8 @@
   #define CMD_UNKNOWN       0xFE
   #define CMD_DATA          0x00
   #define CMD_HARDWARE      0x06
-
+  #define CMD_RETURN        0xFF
+  
   #define HW_RSSI           0x21
   
   #define CMD_ERROR         0x90

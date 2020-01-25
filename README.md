@@ -67,8 +67,9 @@ myloc lat 3536.05N lon 13931.22E　#自局位置
 <interface>
         serial-device /dev/ttyACM0  9600 8n1    KISS
         # TNCの初期文字列
-        # Freq=438.51MHz BW=62.5kHz SF=18 CR=8 Backofftime=10000ms
-        initstring "SET 43851,6,11,8,10000\x0d"
+        # Freq=438.51MHz BW=62.5kHz SF=11 CR=8 Backofftime=10000ms
+        # <FEND><RET><FEND><CR>SET 43851,6,11,8,10000<CR>
+        initstring "\xc0\xff\xc0\x0dSET 43851,7,11,8,10000\x0d"
         callsign     $mycall
         tx-ok        true
 </interface>
