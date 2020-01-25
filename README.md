@@ -1,8 +1,8 @@
 # LoRaKissTNC
 
 [Arduino LoRa](https://github.com/sandeepmistry/arduino-LoRa/blob/master/README.md)を用いたKISSモードTNCです。
-オリジナルは[APRS on LoRa](https://github.com/josefmtd/lora-aprs)のKISSモードTNCです。
-CAD(Channel Activity Detection)がうまくいかないため、送信前にランダムバックオフを入れました。
+オリジナルは[APRS on LoRa](https://github.com/josefmtd/lora-aprs)のKISSモードTNCです。  
+モデムステータスによるCAD(Channel Activity Detection)が動作しないため、送信前にランダムバックオフを入れました。
 
 ## ハードウェア
 [LoRaBot](https://github.com/w-ockham/LoRaBot/edit/master/README.md)と同じ[BSFrance LoRa32u4](https://bsfrance.fr/lora-long-range/1311-BSFrance-LoRa32u4-1KM-Long-Range-Board-Based-Atmega32u4-433MHz-LoRA-RA02-Module.html)
@@ -20,7 +20,7 @@ LoRaトランシーバをOTGケーブルで接続後、設定画面で以下を�
 ```
 %0DSET%2043851%2C6%2C11%2C8%2C10000%0D
 ```
-これはTNCの以下の初期化文字列をURLエンコードしたものです。
+これはTNCの以下の初期化文字列をURLエンコード(`%0D=改行 %20=スペース %2C=,`)したものです。
 ```
  （改行)SET 4351,6,11,8,10000(改行)
 ```
