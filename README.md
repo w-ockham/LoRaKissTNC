@@ -2,7 +2,7 @@
 
 [Arduino LoRa](https://github.com/sandeepmistry/arduino-LoRa/blob/master/README.md)を用いたKISSモードTNCです。
 オリジナルは[APRS on LoRa](https://github.com/josefmtd/lora-aprs)のKISSモードTNCです。  
-モデムステータスによるCAD(Channel Activity Detection)が動作しないため、送信前にランダムバックオフを入れました。
+Arduino LoRaを独自に拡張しCAD(Channel Activity Detection)機能を加え、CSMA/CAを実装しています。
 
 ## ハードウェア
 [LoRaBot](https://github.com/w-ockham/LoRaBot/edit/master/README.md)と同じ[BSFrance LoRa32u4](https://bsfrance.fr/lora-long-range/1311-BSFrance-LoRa32u4-1KM-Long-Range-Board-Based-Atmega32u4-433MHz-LoRA-RA02-Module.html)
@@ -120,5 +120,5 @@ myloc lat 3536.05N lon 13931.22E　#自局位置
 ### コーディングレート
 コーディングレートを `5(4/5) ～ 8(4/8)`の範囲で指定できます。
 ### 最大バックオフ時間
-送信前に500msecからここで指定された時間の範囲でランダムに待ち時間を入れます。
-拡散率が高い場合は衝突が起きる可能性が高いので、フレーム送出時間と同程度の長めのバックオフ時間(BW=62.5,SF=11,CR=8で10000ms程度)を設定してください。
+本プログラムでは送信前に所定時間(3sec)チャンネルのアクティビティを監視し、他局が送信をしていない場合に自局からの送信を行います。  
+衝突が起きた場合には3秒からここで指定された時間の範囲でランダムに待ち時間を入れます。拡散率が高い場合は衝突が起きる可能性が高いので、フレーム送出時間と同程度の長めのバックオフ時間(BW=62.5,SF=11,CR=8で10000ms程度)を設定してください。
