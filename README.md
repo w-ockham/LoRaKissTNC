@@ -5,7 +5,7 @@
 Arduino LoRaを独自に拡張しCAD(Channel Activity Detection)機能を加え、CSMA/CAを実装しています。
 
 ## ハードウェア
-[LoRaBot](https://github.com/w-ockham/LoRaBot/edit/master/README.md)と同じ[BSFrance LoRa32u4](https://bsfrance.fr/lora-long-range/1311-BSFrance-LoRa32u4-1KM-Long-Range-Board-Based-Atmega32u4-433MHz-LoRA-RA02-Module.html)
+[LoRaBot](https://github.com/w-ockham/LoRaBot/master/README.md)と同じ[BSFrance LoRa32u4](https://bsfrance.fr/lora-long-range/1311-BSFrance-LoRa32u4-1KM-Long-Range-Board-Based-Atmega32u4-433MHz-LoRA-RA02-Module.html)
 を用います。
 
 ## インストール方法
