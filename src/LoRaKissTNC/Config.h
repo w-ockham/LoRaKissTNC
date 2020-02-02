@@ -43,10 +43,13 @@
 
   const long serialBaudRate   = 9600;
   
-  int  loraMaxBackoff = 8000;
+  int loraMaxBackoff = 10000;
+  int lbtDuration = 3000;
   uint32_t backofft;
   uint32_t backoffDuration;
-  bool isBackoff = false;
+  uint32_t lastHeard = 0;
+  boolean outboundReady = false;
+  boolean channelBusy = false;
   
   // Default LoRa settings
   int       loraSpreadingFactor = 11;
@@ -63,7 +66,6 @@
 
   uint32_t statRx = 0;
   uint32_t statTx = 0;
-
-  bool outboundReady = false;
-
+  
+ 
 #endif

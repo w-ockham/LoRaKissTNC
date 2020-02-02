@@ -1,4 +1,4 @@
-#include <LoRa.h>
+#include "LoRa.h"
 #include "Config.h"
 #include "KISS.h"
 bool commandMode = true;
@@ -30,6 +30,7 @@ bool startRadio() {
     LoRa.setCodingRate4(loraCodingRate);
     LoRa.setSignalBandwidth(bandWidthTable[loraBandwidth]);
     //LoRa.enableCrc();
+    LoRa.onCadDone(cadCallback);
     LoRa.onReceive(receiveCallback);
     LoRa.receive();
   }
@@ -63,7 +64,7 @@ void serialCallback(uint8_t txByte) {
         //Serial.println("RDY_OUT");
       }
     } else if ( command == CMD_RETURN ) {
-      commandMode = true; 
+      commandMode = true;
     }
   }
   else if (txByte == FEND) {
@@ -104,6 +105,17 @@ bool isOutboundReady() {
   return outboundReady;
 }
 
+void cadCallback(boolean cadDetected) {
+  if (cadDetected) {
+    lastHeard = millis();
+    channelBusy = true;
+    LoRa.receive();
+  } else {
+    LoRa.CAD();
+  }
+  return;
+}
+
 void receiveCallback(int packetSize) {
   readLength = 0;
   lastRssi = LoRa.packetRssi();
@@ -135,6 +147,9 @@ void receiveCallback(int packetSize) {
   }
   Serial.write(FEND);
   readLength = 0;
+  lastHeard = millis();
+  channelBusy = false;
+  LoRa.receive();
 }
 
 void escapedSerialWrite (uint8_t bufferByte) {
@@ -233,18 +248,24 @@ void do_command(char buffer[]) {
   }
 }
 void loop() {
+   uint32_t now = millis();
    if (isOutboundReady() && !SERIAL_READING) {
-    if (!isBackoff) {
-      backofft = millis();
-      backoffDuration = random(500,loraMaxBackoff);
-      isBackoff = true;
-    } else if((millis() - backofft > backoffDuration)) {
-        isBackoff = false;
+    if (now - backofft > backoffDuration) {
+      if (!channelBusy && (now - lastHeard > lbtDuration)) {
         outboundReady = false;
         transmit(frameLength);
+        backofft = 0;
+        backoffDuration = 0;
+        lastHeard = 0;
+      } else {
+        backofft = now;
+        if (backoffDuration > 0)
+          backoffDuration = backoffDuration /2;
+        else 
+          backoffDuration = random(lbtDuration , loraMaxBackoff);
+      }
     }
-   }
-
+  }  
   if (Serial.available()) {
     SERIAL_READING = true;
     char txByte = Serial.read();
