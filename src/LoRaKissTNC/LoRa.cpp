@@ -688,7 +688,11 @@ void LoRaClass::handleDio0Rise()
   // clear IRQ's
   writeRegister(REG_IRQ_FLAGS, irqFlags);
 
-  if ((irqFlags & IRQ_PAYLOAD_CRC_ERROR_MASK) == 0) {
+  if ((irqFlags & IRQ_CAD_DONE_MASK) != 0) {
+    if (_onCadDone) {
+      _onCadDone((irqFlags & IRQ_CAD_DETECTED_MASK) != 0);
+    }
+  } else if ((irqFlags & IRQ_PAYLOAD_CRC_ERROR_MASK) == 0) {
 
     if ((irqFlags & IRQ_RX_DONE_MASK) != 0) {
       // received a packet
@@ -706,11 +710,7 @@ void LoRaClass::handleDio0Rise()
 
       // reset FIFO address
       writeRegister(REG_FIFO_ADDR_PTR, 0);
-    }
-    else if ((irqFlags & IRQ_CAD_DONE_MASK) != 0) {
-      if (_onCadDone) {
-        _onCadDone((irqFlags & IRQ_CAD_DETECTED_MASK) != 0);
-      }
+    	
     } else if ((irqFlags & IRQ_TX_DONE_MASK) != 0) {
       if (_onTxDone) {
         _onTxDone();
