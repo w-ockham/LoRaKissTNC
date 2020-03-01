@@ -2,7 +2,9 @@
 
 [Arduino LoRa](https://github.com/sandeepmistry/arduino-LoRa/blob/master/README.md)を用いたKISSモードTNCです。
 オリジナルは[APRS on LoRa](https://github.com/josefmtd/lora-aprs)のKISSモードTNCです。  
-Arduino LoRaを独自に拡張しCAD(Channel Activity Detection)機能を加え、CSMA/CAを実装しています。
+
+## 通信方式
+[プロトコル](https://github.com/w-ockham/LoRaBot/blob/master/Protocol.md)を参照して下さい。
 
 ## ハードウェア
 [LoRaBot](https://github.com/w-ockham/LoRaBot/blob/master/README.md)と同じ[BSFrance LoRa32u4](https://bsfrance.fr/lora-long-range/1311-BSFrance-LoRa32u4-1KM-Long-Range-Board-Based-Atmega32u4-433MHz-LoRA-RA02-Module.html)
