@@ -25,7 +25,7 @@ void setup() {
 void initLoRa() {
   loraBandwidth = 2;
   LoRa.setSignalBandwidth(bandWidthTable[loraBandwidth]);
-  loraSpreadingFactor = 8;
+  loraSpreadingFactor = 9;
   LoRa.setSpreadingFactor(loraSpreadingFactor);
   loraCodingRate      = 8;
   LoRa.setCodingRate4(loraCodingRate);
