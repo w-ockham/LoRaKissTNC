@@ -17,13 +17,13 @@
   #else
     #error "The firmware cannot be compiled for the selected MCU variant"
   #endif
-  
+
   #define MTU  255
   #define CMD_L       4
   int     lastRssi = 0;
   float   lastSnr  = 0;
   uint8_t lastRssiRaw = 0x00;
-  
+
   size_t  readLength = 0;
 
   #if MCU_VARIANT == MCU_328P
@@ -42,7 +42,7 @@
   #endif
 
   const long serialBaudRate   = 9600;
-  
+
   int loraMaxBackoff = 10000;
   int lbtDuration = 3000;
   uint32_t backofft;
@@ -50,22 +50,26 @@
   uint32_t lastHeard = 0;
   boolean outboundReady = false;
   boolean channelBusy = false;
-  
+
   // Default LoRa settings
-  int       loraSpreadingFactor = 11;
+  int       loraSpreadingFactor = 9;
   int       loraCodingRate      = 8;
   int       loraTxPower         = 20;
+  int       loraPrlen = 8;
+  bool      loraCRC = false;
+  int       loraSyncWord = 0x12;
+
   uint32_t  bandWidthTable[] = { 7.8e3, 10.4e3, 15.6e3, 20.8e3, 31.25e3, 41.7e3, 62.5e3, 125e3, 250e3};
-  uint32_t  loraBandwidth       = 6;
-  const uint32_t freq_low  = 431.0E6;
+  uint32_t  loraBandwidth       = 2;
+  const uint32_t freq_low  = 438.0E6;
   const uint32_t freq_high = 439.0E6;
-  uint32_t  loraFrequency       = 438.41E6;
+  uint32_t  loraFrequency       = 438.51E6;
 
   uint8_t txBuffer[MTU];
   uint8_t rxBuffer[MTU];
 
   uint32_t statRx = 0;
   uint32_t statTx = 0;
-  
- 
+
+
 #endif

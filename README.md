@@ -1,35 +1,116 @@
 # LoRaKissTNC
 
-[Arduino LoRa](https://github.com/sandeepmistry/arduino-LoRa/blob/master/README.md)を用いたKISSモードTNCです。
-オリジナルは[APRS on LoRa](https://github.com/josefmtd/lora-aprs)のKISSモードTNCです。  
+430MHzのLoRaモジュールで以下の機能を実現するスケッチです。※1
+
+1. KISSモードTNC
+1. テキストチャット
+
+「KISSモードTNC」モードでは、LoRaモジュールをKISSモードのターミナルノードコントローラとして動作させます。シリアル回線からAX25形式で送られたパケットを指定された周波数でLoRa変調により送信します。※２
+
+「テキストチャット」モードでは、LoRaモジュールにシリアル接続された端末から送られたテキストメッセージの平文を指定された周波数でLoRa変調により送信します。
+
+※1[Arduino LoRa](https://github.com/sandeepmistry/arduino-LoRa/blob/master/README.md)をベースにLoRaのChannel Activity Detection機能を追加したものを用いています。
+
+※2[APRS on LoRa](https://github.com/josefmtd/lora-aprs)のKISSモードTNCを流用しています。
 
 ## 通信方式
-[プロトコル](https://github.com/w-ockham/LoRaBot/blob/master/Protocol.md)を参照して下さい。
+詳細な通信方式は[プロトコル](https://github.com/w-ockham/LoRaKissTNC/blob/master/Protocol.md)を参照して下さい。
 
 ## ハードウェア
-[LoRaBot](https://github.com/w-ockham/LoRaBot/blob/master/README.md)と同じ[BSFrance LoRa32u4](https://bsfrance.fr/lora-long-range/1311-BSFrance-LoRa32u4-1KM-Long-Range-Board-Based-Atmega32u4-433MHz-LoRA-RA02-Module.html)
-を用います。
+
+ * [Semtech SX1276/77/78/79](http://www.semtech.com/apps/product.php?pn=SX1276)を使ったボードで動作します。:
+   * [BSFrance LoRa32u4](https://bsfrance.fr/lora-long-range/1311-BSFrance-LoRa32u4-1KM-Long-Range-Board-Based-Atmega32u4-433MHz-LoRA-RA02-Module.html)
+
+### Semtech SX1276/77/78/79
+
+| Semtech SX1276/77/78/79 | Arduino |
+| :---------------------: | :------:|
+| VCC | 3.3V |
+| GND | GND |
+| SCK | SCK |
+| MISO | MISO |
+| MOSI | MOSI |
+| NSS | 8 |
+| NRESET | 4 |
+| DIO0 | 7 |
+
+
+`NSS`,`NRESET`,`DIO0`は`LoRa.setPins(csPin, resetPin, irqPin)`. で接続することが出来ます。ボードによってピン接続を変更して下さい。
 
 ## インストール方法
-### Arduino IDEでのコンパイル
-Arduino LoRaをライブラリに追加したArduino IDEでLoRaKissTNCをコンパイルし、ボードにインストールしてください。
+### Arduino IDEにLoRa32u4ボードを追加
+1. ファイル→環境設定で、追加のボードマネージャのURLに以下を追加  
+   `https://adafruit.github.io/arduino-board-index/package_adafruit_index.json`
+2. ツール→ボードで`AdaFruit Feather32u4`を選択
+3. ツール→書込装置で`ArduinoISP`を選択
 
+### コンパイルと書き込み
+1. LoRaKissTNC.inoを開く  
+2. スケッチ→検証・コンパイルでコンパイル  
+3. スケッチ→マイコンボードに書き込むでArduinoへ書き込み  
+
+### スマートフォンとの接続
+1. スマホに[USBシリアル端末](https://play.google.com/store/apps/details?id=jp.sugnakys.usbserialconsole&hl=ja)をインストール
+2. [OTGケーブル](https://www.amazon.co.jp/dp/B012V56C8K)とmicroUSBケーブルを使ってLoRa32u4をスマホに接続
+3. シリアルポートの設定で  
+  ボーレート9600 データビット8 パリティnone ストップビット1 フロー制御off  
+  を選択
+4. 接続の設定で送信フォームの表示、改行コードCR+LFを選択
+
+## KISSモードTNCモード
 ### APRSクライアントの設定
-APRSクライアントとしてAndroid端末上で[APRSDroid](https://aprsdroid.org/)を用います。
-LoRaトランシーバをOTGケーブルで接続後、設定画面で以下を設定してください。
+APRSクライアントとしてAndroid端末上で[APRSDroid](https://aprsdroid.org/)を用います。まずAPRSDroidの設定画面でコールサインを設定して下さい。次にLoRaトランシーバをOTGケーブルで接続し、設定画面で以下を設定してください。
+
 1. 接続方式 TNC(KISS)を選択します
 2. TNC初期化設定 初期化設定文字列にTNCの初期化文字列をURLエンコードした文字を設定します。
 ```
-%0DSET%2043851%2C6%2C11%2C8%2C10000%0D
+%0DSET%20KISS%2043851%2C6%2C11%2C8%2C10000%0D
 ```
 これはTNCの以下の初期化文字列をURLエンコード(`%0D=改行 %20=スペース %2C=,`)したものです。
 ```
- （改行)SET 4351,6,11,8,10000(改行)
+ （改行)SET KISS 43851,6,11,8,10000(改行)
 ```
 初期化文字列の詳細については後述します。
 
 3. 接続タイプ USBシリアルを設定します。
 4. 機器通信速度 9600bpsを設定します。
+
+以上で完了です。
+
+ARPSDroidを起動するとTNCへAX.25形式のパケットが送られます。LoRa対応のi-gate局からデジピートされます。
+
+### TNC初期化文字列について
+SET KISSコマンドにより、LoRaモジュールをKISS TNCモードにします。
+初期化文字列を用いてモジュールのパラメータを以下の通り指定できます。
+```
+  SET KISS <キャリア周波数(10kHz単位)> , <帯域> , <拡散率> , <コーディングレート>, <最大バックオフ時間(ms)>
+  ```
+各パラメータの詳細については「テキストチャット」モードのコマンドを参照して下さい。
+#### キャリア周波数
+ 438.0MHz～439MHzまで10kHz単位で指定します。範囲外の周波数が指定された場合は送信出来ません。
+#### 帯域
+以下のBW値を指定します。デフォルト値は15.6kHzです。
+※免許されている範囲で指定して下さい。
+
+| BW値 | 帯域幅 |
+|:-----|:-------|
+|0 | 7.8kHz |
+|1 | 10.4kHz |
+|2 | 15.6kHz（デフォルト値) |
+|3 | 20.8kHz |
+|4 | 31.25kHz |
+|5 | 41.7kHz |
+|6 | 62.5kHz |
+|7 | 125kHz |
+|8 | 250kHz |
+
+#### 拡散率
+拡散率を`7(2^7=128) ～ 12(2^12=4096)`の範囲で指定できます。
+#### コーディングレート
+コーディングレートを `5(4/5) ～ 8(4/8)`の範囲で指定できます。
+#### 最大バックオフ時間
+本プログラムでは送信前に所定時間(3sec)チャンネルのアクティビティを監視し、他局が送信をしていない場合に自局からの送信を行います。  
+衝突が起きた場合には3秒からここで指定された時間の範囲でランダムに待ち時間を入れます。拡散率が高い場合は衝突が起きる可能性が高いので、フレーム送出時間と同程度の長めのバックオフ時間(BW=62.5,SF=11,CR=8で10000ms程度)を設定してください。
 
 ### APRSゲートウェイへのパッチ
 LoRaKissTNCはKISSプロトコルで受信パケットのRSSI/SNRを返します。APRSゲートウェイ側でも表示できるように[APRX](https://github.com/PhirePhly/aprx/blob/master/README)のパッチを用意しました。
@@ -69,9 +150,9 @@ myloc lat 3536.05N lon 13931.22E　#自局位置
 <interface>
         serial-device /dev/ttyACM0  9600 8n1    KISS
         # TNCの初期文字列
-        # Freq=438.51MHz BW=62.5kHz SF=11 CR=8 Backofftime=10000ms
-        # <FEND><RET><FEND><CR>SET 43851,6,11,8,10000<CR>
-        initstring "\xc0\xff\xc0\x0dSET 43851,7,11,8,10000\x0d"
+        # Freq=438.51MHz BW=15.6kHz SF=8 CR=8 Backofftime=10000ms
+        # <FEND><RET><FEND><CR>SET KISS 43851,6,11,8,10000<CR>
+        initstring "\xc0\xff\xc0\x0dSET KISS 43851,2,8,8,10000\x0d"
         callsign     $mycall
         tx-ok        true
 </interface>
@@ -95,21 +176,74 @@ myloc lat 3536.05N lon 13931.22E　#自局位置
     </source>
 </digipeater>
 ```
-## TNC初期化文字列について
-初期化文字列は以下の通り指定できます。
-```
-  SET <キャリア周波数(10kHz単位)> , <帯域> , <拡散率> , <コーディングレート>, <最大バックオフ時間(ms)>
-  ```
-### キャリア周波数
- 431.0MHz～439MHzまで10kHz単位で指定します。全電波形式の438MHz-439MHzを指定するようにしましょう。
-### 帯域
-以下のBW値を指定します。
+## テキストチャットモード
+テキストチャットモードでは端末から入力された文字を行単位で平文で送信します。
+行頭が`set`で始まる行はコマンド列として解釈されます。
 
+まず交信の前にコールサインを設定して下さい。（コールサインを設定しないと送信出来ません）
+```sh
+ set call <あなたのコールサイン>
+```
+
+次にコマンドを使って運用周波数やLoRa変調のパラメータを設定して下さい。デフォルトでは周波数438.51MHz、SF=8、BW=15.6kHz 出力20dBm(100mW)の設定になっています。
+```sh
+set
+Freq=43851
+SF=8
+BW=2　(15.6kHz)
+TXpower=20
+```
+ターミナルからメッセージを入れ、最後に改行(CR/LF)を入力して下さい。
+メッセージの送信が完了すると以下のように表示されます。
+```sh
+ <コールサイン> >: <送信したメッセージ>
+```
+相手局からメッセージを受信すると以下のように表示されます。
+```sh
+ <相手局コールサイン> (<RSSI値>,<SNR値>,<周波数エラー値>)<: <受信したメッセージ>
+ ```
+
+## コマンド
+
+### 自局コールサインの指定
+自局のコールサインを指定します。パケット先頭には必ず自局コールサインが入ります。
+またコールサインが指定されていない場合送信できません。
+```sh
+set call コールサイン
+```
+
+### 周波数の設定
+運用周波数を10kHz単位で指定します。
+指定できる範囲は438MHz-439MHz(全電波形式の範囲)です。
+デフォルト値は438.51MHzです。
+```sh
+ set freq 43851
+```
+### 送信出力の設定
+送信出力をdBmで指定します。2dBm - 20dBmの範囲です。
+デフォルト値は20dBmです。
+```sh
+ set pwr 20
+```
+### 拡散率(SF)の指定
+拡散率(Spreading Factor)を指定します。6 - 12の範囲です。
+  小さい値ほど高速に送信できますがSNRでは不利になります。
+  デフォルト値は9です。
+```sh
+ set sf 9
+```
+### 帯域幅(BW)の指定
+チャープスペクトラムの帯域幅を指定します。0-8の範囲です。
+帯域幅が広いほど高速に送信できますがSNRでは不利になります。
+デフォルト値は2(15.6kHz)です。必ず免許されている範囲内で設定して下さい。
+```sh
+ set bw 2
+ ```
 | BW値 | 帯域幅 |
 |:-----|:-------|
 |0 | 7.8kHz |
 |1 | 10.4kHz |
-|2 | 15.6kHz |
+|2 | 15.6kHz (デフォルト値) |
 |3 | 20.8kHz |
 |4 | 31.25kHz |
 |5 | 41.7kHz |
@@ -117,10 +251,17 @@ myloc lat 3536.05N lon 13931.22E　#自局位置
 |7 | 125kHz |
 |8 | 250kHz |
 
-### 拡散率
-拡散率を`7(2^7=128) ～ 12(2^12=4096)`の範囲で指定できます。
-### コーディングレート
-コーディングレートを `5(4/5) ～ 8(4/8)`の範囲で指定できます。
-### 最大バックオフ時間
-本プログラムでは送信前に所定時間(3sec)チャンネルのアクティビティを監視し、他局が送信をしていない場合に自局からの送信を行います。  
-衝突が起きた場合には3秒からここで指定された時間の範囲でランダムに待ち時間を入れます。拡散率が高い場合は衝突が起きる可能性が高いので、フレーム送出時間と同程度の長めのバックオフ時間(BW=62.5,SF=11,CR=8で10000ms程度)を設定してください。
+### 設定の確認
+`set`コマンドでパラメータを指定しないと現在の設定値が表示されます。
+```sh
+Freq=43851
+SF=9
+BW=2　(15.6kHz)
+TXpower=20
+```
+
+### 設定の初期化
+設定をデフォルト値に戻します。
+```sh
+set init
+```
