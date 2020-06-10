@@ -254,7 +254,7 @@ void set_Freq(uint32_t f) {
 
 void set_BW(int bw) {
   mesg("BW",bw);
-  if (bw < 0 || bw > 8) {
+  if (bw < 0 || bw > 3) {
     mesg("ERR","unsupported bandwidth.");
     return;
   }
