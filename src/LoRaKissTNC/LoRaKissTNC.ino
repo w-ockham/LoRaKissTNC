@@ -315,7 +315,8 @@ void do_command(char buffer[]) {
   int bw, sf, cr, pwr, backoff;
 
   cmd = strtok(buffer," ");
-  if (strcasecmp(cmd,"KISS") == 0) {
+  
+  if (strcasecmp(cmd, "KISS") == 0) {
     f = atol(strtok(NULL,","));
     bw = atoi(strtok(NULL,","));
     sf = atoi(strtok(NULL,","));
@@ -331,7 +332,9 @@ void do_command(char buffer[]) {
     kissMode = true;
     return;
   }
-  if (strcasecmp(cmd, "FREQ") == 0) {
+
+  cmd = strtok(NULL," ");
+  if (strcasecmp(cmd , "FREQ") == 0) {
     f = atol(strtok(NULL," "));
     set_Freq(f);
     return;
@@ -366,17 +369,19 @@ void do_command(char buffer[]) {
     return;
   }
   Serial.print(F("Unknown command:"));
-    Serial.println(buffer);
+  Serial.println(buffer);
 }
 
 void loop() {
+ char *cmd;
  if (kissMode) {
    kiss_loop();
  } else if(Serial.available()) {
    char txByte = Serial.read();
    if (txByte == '\r') {
     line_buffer[bufc] = '\0';
-    if (strcasecmp(strtok(line_buffer," "), "SET"))
+    if (strncasecmp(line_buffer, "SET", 3) == 0 ||
+        strncasecmp(line_buffer, "KISS", 4) == 0)
       do_command(line_buffer);
     else {
       text_transmit(line_buffer);
