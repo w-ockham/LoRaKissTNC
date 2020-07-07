@@ -15,8 +15,8 @@ myloc lat 3536.05N lon 13931.22E
 <interface>
 	serial-device /dev/ttyACM0  9600 8n1    KISS
 	# Freq=438.51MHz BW=20.8kHz SF=9 CR=8 Backofftime=10000ms
-    # <FEND><RET><FEND><CR>KISS 43851,3,9,8,10000<CR>
-	initstring "\xc0\xff\xc0\x0dKISS 43851,3,9,8,10000\x0d"
+    # <FEND><RET><FEND><CR>KISS 43851,3,8,8,10000<CR>
+	initstring "\xc0\xff\xc0\x0dKISS 43851,3,8,8,10000\x0d"
 	callsign     $mycall
 	tx-ok        true
 </interface>
