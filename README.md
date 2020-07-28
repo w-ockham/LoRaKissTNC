@@ -64,11 +64,11 @@ APRSクライアントとしてAndroid端末上で[APRSDroid](https://aprsdroid.
 1. 接続方式 TNC(KISS)を選択します
 2. TNC初期化設定 初期化設定文字列にTNCの初期化文字列をURLエンコードした文字を設定します。
 ```
-%0DKISS%2043851%2C6%2C11%2C8%2C10000%0D
+%0DKISS%2043851%2C3%2C8%2C8%2C10000%0D
 ```
 これはTNCの以下の初期化文字列をURLエンコード(`%0D=改行 %20=スペース %2C=,`)したものです。
 ```
- （改行)KISS 43851,6,11,8,10000(改行)
+ （改行)KISS 43851,3,8,8,10000(改行)
 ```
 初期化文字列の詳細については後述します。
 
@@ -147,8 +147,8 @@ myloc lat 3536.05N lon 13931.22E　#自局位置
         serial-device /dev/ttyACM0  9600 8n1    KISS
         # TNCの初期文字列
         # Freq=438.51MHz BW=15.6kHz SF=8 CR=8 Backofftime=10000ms
-        # <FEND><RET><FEND><CR>SET KISS 43851,6,11,8,10000<CR>
-        initstring "\xc0\xff\xc0\x0dSET KISS 43851,2,8,8,10000\x0d"
+        # <FEND><RET><FEND><CR>SET KISS 43851,3,8,8,10000<CR>
+        initstring "\xc0\xff\xc0\x0dSET KISS 43851,3,8,8,10000\x0d"
         callsign     $mycall
         tx-ok        true
 </interface>
