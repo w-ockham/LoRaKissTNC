@@ -233,11 +233,13 @@ void recv_mesg(String& hiscall, String& rssi, String& snr, String& mesg) {
 
 void mesg(char* prop, uint32_t param) {
   Serial.print(prop);
+  Serial.print(' ');
   Serial.println(param);
 }
 
 void mesg(char* prop, char* param) {
   Serial.print(prop);
+  Serial.print(' ');
   Serial.println(param);
 }
 
