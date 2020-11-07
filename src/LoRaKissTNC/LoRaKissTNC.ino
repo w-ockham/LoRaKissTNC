@@ -23,22 +23,15 @@ void setup() {
 }
 
 void initLoRa() {
-  loraBandwidth = 2;
   LoRa.setSignalBandwidth(bandWidthTable[loraBandwidth]);
-  loraSpreadingFactor = 9;
   LoRa.setSpreadingFactor(loraSpreadingFactor);
-  loraCodingRate      = 8;
   LoRa.setCodingRate4(loraCodingRate);
-  loraTxPower         = 20;
   LoRa.setTxPower(loraTxPower);
-  loraPrlen = 8;
   LoRa.setPreambleLength(loraPrlen);
-  loraCRC = false;
   if (loraCRC)
     LoRa.enableCrc();
   else
     LoRa.disableCrc();
-  loraSyncWord = 0x12;
   LoRa.setSyncWord(loraSyncWord);
   mycall[0] = '\0';
 
