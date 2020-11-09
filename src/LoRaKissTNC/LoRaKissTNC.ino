@@ -23,22 +23,16 @@ void setup() {
 }
 
 void initLoRa() {
-  loraBandwidth = 2;
   LoRa.setSignalBandwidth(bandWidthTable[loraBandwidth]);
-  loraSpreadingFactor = 9;
   LoRa.setSpreadingFactor(loraSpreadingFactor);
-  loraCodingRate      = 8;
   LoRa.setCodingRate4(loraCodingRate);
-  loraTxPower         = 20;
   LoRa.setTxPower(loraTxPower);
-  loraPrlen = 8;
   LoRa.setPreambleLength(loraPrlen);
-  loraCRC = false;
-  if (loraCRC)
+  if (loraCRC) {
     LoRa.enableCrc();
-  else
+  } else {
     LoRa.disableCrc();
-  loraSyncWord = 0x12;
+  }
   LoRa.setSyncWord(loraSyncWord);
   mycall[0] = '\0';
 
@@ -52,8 +46,7 @@ bool startRadio() {
     kissIndicateError(ERROR_INITRADIO);
     Serial.println("FAIL");
     while(1);
-  }
-  else {
+  } else {
     initLoRa();
   }
 }
@@ -77,12 +70,13 @@ void transmit(size_t size) {
 void text_transmit(char* buffer) {
   if (strlen(mycall) == 0) {
     mesg("ERR","Set your callsign.");
-  return;
+    return;
   }
   strcpy(txBuffer, mycall);
   strcat(txBuffer, " >: ");
-  if (strlen(buffer) < BUFFSIZE)
+  if (strlen(buffer) < BUFFSIZE) {
     strcat(txBuffer, buffer);
+  }
   transmit(strlen(txBuffer));
 }
 
@@ -90,9 +84,9 @@ void serialCallback(uint8_t txByte) {
   if (inFrame && txByte == FEND) {
     inFrame = false;
     if ( command == CMD_DATA ) {
-       //Serial.println("FULL_KISS");
-       if (outboundReady) {
-         kissIndicateError(ERROR_QUEUE_FULL);
+      //Serial.println("FULL_KISS");
+      if (outboundReady) {
+        kissIndicateError(ERROR_QUEUE_FULL);
       } else {
         outboundReady = true;
         //Serial.println("RDY_OUT");
@@ -100,24 +94,20 @@ void serialCallback(uint8_t txByte) {
     } else if ( command == CMD_RETURN ) {
       kissMode = false;
     }
-  }
-  else if (txByte == FEND) {
+  } else if (txByte == FEND) {
     //Serial.println("KISS_FLAG");
     inFrame = true;
     command = CMD_UNKNOWN;
     frameLength = 0;
-  }
-  else if (inFrame && frameLength < MTU) {
+  } else if (inFrame && frameLength < MTU) {
     // Get command byte
     if (frameLength == 0 && command == CMD_UNKNOWN) {
       //Serial.println("ACQ_CMD");
       command = txByte;
-    }
-    else if (command == CMD_DATA) {
+    } else if (command == CMD_DATA) {
       if (txByte == FESC) {
         escape = true;
-      }
-      else {
+      } else {
         if (escape) {
           if (txByte == TFEND) {
             txByte = FEND;
@@ -126,8 +116,7 @@ void serialCallback(uint8_t txByte) {
             txByte = FESC;
           }
           escape = false;
-        }
-        else {
+        } else {
           txBuffer[frameLength++] = txByte;
         }
       }
@@ -182,14 +171,15 @@ void receiveCallback(int packetSize) {
     }
     Serial.write(FEND);
   } else {
-      String incoming;
-      String rssi = String(lastRssi);
-      String snr = String(lastSnr);
-      for(int i = 0; i < readLength; i++)
-        incoming += (char)rxBuffer[i];
-      String hiscall = incoming.substring(0,incoming.indexOf(">:"));
-      String message = incoming.substring(incoming.indexOf(">:")+2);
-      recv_mesg(hiscall,rssi,snr,message);
+    String incoming;
+    String rssi = String(lastRssi);
+    String snr = String(lastSnr);
+    for(int i = 0; i < readLength; i++) {
+      incoming += (char)rxBuffer[i];
+    }	
+    String hiscall = incoming.substring(0,incoming.indexOf(">:"));
+    String message = incoming.substring(incoming.indexOf(">:")+2);
+    recv_mesg(hiscall,rssi,snr,message);
   }
 
   readLength = 0;
@@ -233,11 +223,13 @@ void recv_mesg(String& hiscall, String& rssi, String& snr, String& mesg) {
 
 void mesg(char* prop, uint32_t param) {
   Serial.print(prop);
+  Serial.print(' ');
   Serial.println(param);
 }
 
 void mesg(char* prop, char* param) {
   Serial.print(prop);
+  Serial.print(' ');
   Serial.println(param);
 }
 
@@ -296,7 +288,9 @@ void set_Call(char *call) {
   if (strlen(call) < 12) {
     strcpy(mycall, call);
     mesg("CALL", mycall);
-  } else mesg("ERR","callsign too long.");
+  } else {
+    mesg("ERR","callsign too long.");
+  }
   return;
 }
 
@@ -373,27 +367,28 @@ void do_command(char buffer[]) {
 }
 
 void loop() {
- char *cmd;
- if (kissMode) {
-   kiss_loop();
- } else if(Serial.available()) {
-   char txByte = Serial.read();
-   if (txByte == '\r') {
-    line_buffer[bufc] = '\0';
-    if (strncasecmp(line_buffer, "SET", 3) == 0 ||
-        strncasecmp(line_buffer, "KISS", 4) == 0)
-      do_command(line_buffer);
-    else {
-      text_transmit(line_buffer);
+  char *cmd;
+  if (kissMode) {
+    kiss_loop();
+  } else if(Serial.available()) {
+    char txByte = Serial.read();
+    if (txByte == '\r') {
+      line_buffer[bufc] = '\0';
+      if (strncasecmp(line_buffer, "SET", 3) == 0 ||
+          strncasecmp(line_buffer, "KISS", 4) == 0) {
+        do_command(line_buffer);
+      } else {
+        text_transmit(line_buffer);
+      }
+      line_buffer[0] = '\0';
+      bufc = 0;
+    } else {
+      line_buffer[bufc++] =  txByte;
+      if (bufc > (MTU - 16)) {
+        bufc = MTU - 16;
+      }
     }
-    line_buffer[0] = '\0';
-    bufc = 0;
-   } else {
-    line_buffer[bufc++] =  txByte;
-    if (bufc > (MTU - 16))
-     bufc = MTU - 16;
-   }
- }
+  }
 }
 
 void kiss_loop() {
@@ -408,10 +403,11 @@ void kiss_loop() {
         lastHeard = 0;
       } else {
         backofft = now;
-        if (backoffDuration > 0)
+        if (backoffDuration > 0) {
           backoffDuration = backoffDuration /2;
-        else
+        } else {
           backoffDuration = random(lbtDuration , loraMaxBackoff);
+        }
       }
     }
   }
