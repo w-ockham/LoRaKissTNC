@@ -22,7 +22,7 @@ LoRaパケットフォーマットは以下の通りです。
 
 パケットはExplicitヘッダーモードで送信され、Explicitヘッダにはペイロード長、ペイロードのコーディングレート、
 ペイロードのCRCの有無（本方式では無）が入ります。ヘッダー自身はコーディングレート 4/8でCRC付きで送信されます。
-詳細については [Semtech SX1276/77/78/79](http://www.semtech.com/apps/product.php?pn=SX1276)データシートを参照して下さい。
+詳細については [Semtech SX1276/77/78/79](https://www.semtech.com/products/wireless-rf/lora-transceivers/sx1276)データシートを参照して下さい。
 
 ### ペイロード
 ペイロードには平文を送る「平文ペイロード」とAX.25に準拠したパケットフォーマットで送る「AX.25ペイロード」の2種類があります。
