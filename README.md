@@ -18,7 +18,7 @@
 
 ## ハードウェア
 
- * [Semtech SX1276/77/78/79](http://www.semtech.com/apps/product.php?pn=SX1276)を使ったボードで動作します。:
+ * [Semtech SX1276/77/78/79](https://www.semtech.com/products/wireless-rf/lora-transceivers/sx1276)を使ったボードで動作します。:
    * [BSFrance LoRa32u4](https://bsfrance.fr/lora-long-range/1311-BSFrance-LoRa32u4-1KM-Long-Range-Board-Based-Atmega32u4-433MHz-LoRA-RA02-Module.html)
 
 ### Semtech SX1276/77/78/79
